@@ -8,5 +8,5 @@
 ```
 3. 动作配置点 自动生成 并保存
 4. 安装好arduino的esp8266支持，不懂百度或google查
-5. 安装这两个依赖库 [Arduino-HomeKit-ESP8266](https://github.com/Mixiaoxiao/Arduino-HomeKit-ESP8266/archive/refs/heads/master.zip) [blinker](https://github.com/blinker-iot/blinker-library/archive/refs/heads/master.zip)
+5. 安装这两个依赖库 [Arduino-HomeKit-ESP8266](https://github.com/Mixiaoxiao/Arduino-HomeKit-ESP8266/archive/refs/heads/master.zip) [blinker](https://github.com/blinker-iot/blinker-library/archive/refs/heads/master.zip) 在arduino点加载zip库选择下载的zip就行了
 6. 编译烧录
