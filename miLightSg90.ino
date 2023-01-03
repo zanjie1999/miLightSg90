@@ -20,9 +20,9 @@ char auth[] = "yourBlinkerDeviceKey";
 char ssid[] = "wifiSsid";
 char pswd[] = "wifiPwd";
 const int sgIo = 4;
-const int onDeg = 115;
-const int offDeg = 100;
-const int stayDeg = 45;
+const int onDeg = 145;
+const int offDeg = 140;
+const int stayDeg = 112;
 
 bool oState = false;
 Servo sg;
@@ -70,6 +70,8 @@ void dataRead(const String & data) {
 }
 
 void setOnOff(bool isOn) {
+    // 启用输出舵机工作
+    pinMode(sgIo, OUTPUT);
     if (isOn) {
         BUILTIN_SWITCH.print("on");
 //        onoffButton.print("on");
@@ -85,8 +87,11 @@ void setOnOff(bool isOn) {
         cha_switch_on.value.bool_value = false;
         sg.write(offDeg);
     }
-    delay(100);
+    delay(250);
     sg.write(stayDeg);
+    // 关闭输出给舵机延寿 问就是已经烧了一个舵机的电机
+    delay(200);
+    pinMode(sgIo, INPUT);
     homekit_characteristic_notify(&cha_switch_on, cha_switch_on.value);
     oState = isOn;
 }
@@ -118,6 +123,7 @@ void setOnOffBtnLed(const String & state) {
 }
   
 void setDeg(int32_t value) {
+    pinMode(sgIo, OUTPUT);
     sg.write(value);
     Blinker.vibrate();
 }
@@ -135,8 +141,11 @@ void setup() {
     Serial.begin(115200);
     BLINKER_DEBUG.stream(Serial);
 
-    sg.attach(sgIo);
+    // sg90的实际工作范围 这样初始化才能到180度
+    sg.attach(sgIo, 500, 2400);
     sg.write(stayDeg);
+    delay(200);
+    pinMode(sgIo, INPUT);
 
     pinMode(LED_BUILTIN, OUTPUT);
     digitalWrite(LED_BUILTIN, HIGH);
@@ -165,6 +174,6 @@ void setup() {
 
 void loop() {
     Blinker.run();
-    arduino_homekit_loop();
     httpServer.handleClient();
+    arduino_homekit_loop();
 }
