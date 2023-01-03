@@ -8,13 +8,15 @@
 
 #define BLINKER_WIFI
 #define BLINKER_MIOT_OUTLET
+#define ZYYMEHOMEKIT
 
 #include <Blinker.h>
 #include <Servo.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266HTTPUpdateServer.h>
+#ifdef ZYYMEHOMEKIT
 #include <arduino_homekit_server.h>
-
+#endif
 
 char auth[] = "yourBlinkerDeviceKey";
 char ssid[] = "wifiSsid";
@@ -34,8 +36,10 @@ BlinkerButton onoffButton("btn-onoff");
 BlinkerSlider degSlider("ran-deg");
 
 // 因为用C语法写的配置所以
+#ifdef ZYYMEHOMEKIT
 extern "C" homekit_server_config_t config;
 extern "C" homekit_characteristic_t cha_switch_on;
+#endif
 
 void miotQuery(int32_t queryCode) {
     BLINKER_LOG("MIOT Query codes: ", queryCode);
@@ -77,14 +81,18 @@ void setOnOff(bool isOn) {
 //        onoffButton.print("on");
         BlinkerMIOT.powerState("on");
         BlinkerMIOT.print();
+        #ifdef ZYYMEHOMEKIT
         cha_switch_on.value.bool_value = true;
+        #endif
         sg.write(onDeg);
     } else {
         BUILTIN_SWITCH.print("off");
 //        onoffButton.print("off");
         BlinkerMIOT.powerState("off");
         BlinkerMIOT.print();
+        #ifdef ZYYMEHOMEKIT
         cha_switch_on.value.bool_value = false;
+        #endif
         sg.write(offDeg);
     }
     delay(250);
@@ -92,7 +100,9 @@ void setOnOff(bool isOn) {
     // 关闭输出给舵机延寿 问就是已经烧了一个舵机的电机
     delay(200);
     pinMode(sgIo, INPUT);
+    #ifdef ZYYMEHOMEKIT
     homekit_characteristic_notify(&cha_switch_on, cha_switch_on.value);
+    #endif
     oState = isOn;
 }
 
@@ -133,9 +143,11 @@ String summary() {
     return data;
 }
 
+#ifdef ZYYMEHOMEKIT
 void cha_switch_on_setter(const homekit_value_t value) {
     setOnOff(value.bool_value); 
 }
+#endif
 
 void setup() {
     Serial.begin(115200);
@@ -164,8 +176,10 @@ void setup() {
     BlinkerMIOT.attachPowerState(miotPowerState);
     BlinkerMIOT.attachQuery(miotQuery);
 
+    #ifdef ZYYMEHOMEKIT
     cha_switch_on.setter = cha_switch_on_setter;
     arduino_homekit_setup(&config);
+    #endif
 
     httpUpdater.setup(&httpServer);
     httpServer.begin();
@@ -175,5 +189,7 @@ void setup() {
 void loop() {
     Blinker.run();
     httpServer.handleClient();
+    #ifdef ZYYMEHOMEKIT
     arduino_homekit_loop();
+    #endif
 }
