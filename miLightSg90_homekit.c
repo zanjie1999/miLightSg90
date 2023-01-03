@@ -1,6 +1,8 @@
 /*
  * homekit config
  */
+#define ZYYMEHOMEKIT
+
 #ifdef ZYYMEHOMEKIT
 #include <homekit/homekit.h>
 #include <homekit/characteristics.h>
