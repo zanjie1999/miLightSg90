@@ -1,7 +1,7 @@
 /*
  * homekit config
  */
-
+#ifdef ZYYMEHOMEKIT
 #include <homekit/homekit.h>
 #include <homekit/characteristics.h>
 
@@ -40,3 +40,4 @@ homekit_server_config_t config = {
     .accessories = accessories,
     .password = "111-11-111"
 };
+#endif
